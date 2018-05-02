@@ -1,20 +1,13 @@
-function formatNumber (n) {
-  const str = n.toString()
-  return str[1] ? str : `0${str}`
+import moment from 'moment';
+
+export default function genTimeRange(day, rangeType) {
+  const d = moment(moment().set('days', day).format('YYYY MM DD'));
+  if (rangeType === 1) {
+    return [moment(d).set('hours', 0), moment(d).set('hours', 10)];
+  } else if (rangeType === 2) {
+    return [moment(d).set('hours', 11), moment(d).set('hours', 14)];
+  } else if (rangeType === 3) {
+    return [moment(d).set('hours', 15), moment(d).set('hours', 23)];
+  }
+  return [d, d];
 }
-
-export function formatTime (date) {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
-
-  const t1 = [year, month, day].map(formatNumber).join('/')
-  const t2 = [hour, minute, second].map(formatNumber).join(':')
-
-  return `${t1} ${t2}`
-}
-

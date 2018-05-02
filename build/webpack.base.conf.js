@@ -1,3 +1,4 @@
+/* eslint-disable */
 var path = require('path')
 var fs = require('fs')
 var utils = require('./utils')
@@ -41,7 +42,11 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue': 'mpvue',
-      '@': resolve('src')
+      'zanui': 'mpvue-zanui/src',
+      '@': resolve('src'),
+      'static': resolve('static'),
+      'flyio': 'flyio/dist/npm/wx',
+      'assets': resolve('src/assets')
     },
     symlinks: false
   },
@@ -69,7 +74,7 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
-          limit: 10000,
+          limit: 100000,
           name: utils.assetsPath('img/[name].[ext]')
         }
       },
