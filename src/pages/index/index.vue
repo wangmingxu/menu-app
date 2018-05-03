@@ -210,6 +210,7 @@
 
 <template>
   <div class="container">
+    <web-view :src="webviewUrl" v-if="webviewUrl" @message="onWebviewMessage($event)"></web-view>
     <div class="mask" v-if="showCart" @click="toggleCart()"></div>
     <div class="mask" v-if="showAsidebar" @click="toggleAsideBar()"></div>
     <div class="asidebar" :class="{active:showAsidebar}">
@@ -268,7 +269,7 @@
     <swiper :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500" @change="onTabChange($event)">
       <block v-for="(item, idx) in banners" :key="idx">
         <swiper-item>
-          <image :src="item.cover_url" class="slide-image" width="355" height="150" />
+          <image :src="item.cover_url" class="slide-image" height="150" @click="openWithWebview(item.public_target_url)"/>
         </swiper-item>
       </block>
     </swiper>
@@ -301,13 +302,13 @@
           <zan-loadmore :loading="true" v-if="loading"></zan-loadmore>
           <div class="zan-panel">
             <div class="zan-card" v-for="item in foodList[currentCategory]" :key="item.id">
-              <img class="thumb" :src="item.image_url" alt="">
+              <image class="thumb" :src="item.image_url" alt="" mode="aspectFit" @click="preview(item.image_url)"></image>
               <div class="food-name">{{item.name}}</div>
               <div class="zan-row">
                 <div class="zan-col zan-col-11 toggle-like">
-                  <div class="btn-like" :class="{active:item.status==='like'}" @click="toggleLike(item,'like')"></div>
+                  <div class="btn-like" :class="{active:item.liked}" @click="toggleLike(item,'like')"></div>
                   <div class="like-count">{{item.like}}</div>
-                  <div class="btn-dislike" :class="{active:item.status==='dislike'}" @click="toggleLike(item,'dislike')"></div>
+                  <div class="btn-dislike" :class="{active:item.unliked}" @click="toggleLike(item,'unlike')"></div>
                   <div class="dislike-count">{{item.unlike}}</div>
                 </div>
                 <div class="zan-col zan-col-13"  v-if="currentMeal===3">
@@ -358,6 +359,7 @@
         showAsidebar: false,
         showCart: false,
         steppers: {},
+        webviewUrl: '',
       };
     },
     computed: {
@@ -453,9 +455,9 @@
       toggleCart() {
         this.showCart = !this.showCart;
       },
-      async toggleLike(item, status) {
-        Vue.set(item, 'status', status);
-        if (status === 'like') {
+      async toggleLike(item, type) {
+        // Vue.set(item, 'liked', status);
+        if (type === 'like') {
           await this.$http.get('/like-menu/toggle-like', {
             menu_id: item.id,
           });
@@ -470,6 +472,11 @@
         Object.keys(this.steppers).forEach((key) => {
           this.steppers[key].stepper = 0;
         });
+      },
+      preview(url) {
+        wx.previewImage({
+          urls:[url]
+        })
       },
       async createOrder() {
         if (this.cartList.length === 0) {
@@ -491,6 +498,12 @@
           url: '/pages/preview/main',
         });
       },
+      openWithWebview(url) {
+        this.webviewUrl = url;
+      },
+      onWebviewMessage(e){
+        console.log(e);
+      }
     },
 
     async onLoad() {
