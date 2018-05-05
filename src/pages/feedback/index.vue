@@ -2,11 +2,11 @@
     <div>
         <div class="zan-panel-title">反馈内容:</div>
         <div class="zan-panel">
-            <textarea class="mark" placeholder="请填写反馈内容" auto-focus @input="onRemarkChange($event)"></textarea>
+            <textarea class="mark" :value="remark" placeholder="请填写反馈内容" auto-focus @input="onRemarkChange($event)"></textarea>
         </div>
         <div class="zan-panel-title">图片(可选):</div>
         <div class="zan-panel zan-panel--without-border upload-pic">
-            <uploader :files="files" @fileChange="fileChangeHandle($event)"></uploader>
+            <uploader :files="tempFiles" @fileChange="fileChangeHandle($event)"></uploader>
         </div>
         <div class="zan-btn zan-btn--primary btn-submit" @click="submit()">提交</div>
     </div>
@@ -26,6 +26,8 @@
         return {
           files: [],
           remark: '',
+          tempFiles: [],
+          fileMap: {},
         };
       },
 
@@ -34,11 +36,14 @@
           this.remark = e.target.value;
         },
         async fileChangeHandle(e) {
-          this.files = e;
+          this.tempFiles = e;
           const { token } = await this.$http.get('/upload/qiniu/token');
-          const tasks = this.files.map((item) => {
-            if (String.prototype.startsWith.call(item, qiniuDomain)) {
-              return Promise.resolve(item);
+          console.log('tempFiles', this.tempFiles);
+          const tasks = this.tempFiles.map((item) => {
+            console.log(item);
+            // console.log(Object.prototype.hasOwnProperty.call(this.fileMap,item));
+            if (Object.prototype.hasOwnProperty.call(this.fileMap, item)) {
+              return Promise.resolve(this.fileMap[item]);
             }
             return promisify(wx.uploadFile, {
               url: 'https://up-z2.qiniup.com',
@@ -50,12 +55,15 @@
             })
               .then(({ data }) => {
                 const rst = JSON.parse(data);
-                return `${qiniuDomain}/${rst.key}`;
+                const url = `${qiniuDomain}/${rst.key}`;
+                this.fileMap[item] = url;
+                return url;
               });
           });
           this.files = await Promise.all(tasks);
         },
         async submit() {
+          console.log(this.files);
           await this.$http.post('/feedback', {
             content: this.remark,
             images: this.files.map(url => ({ url })),
@@ -64,6 +72,12 @@
             title: '提交成功',
             icon: 'success',
           });
+          this.resetData();
+        },
+        resetData() {
+          this.files = [];
+          this.remark = '';
+          this.tempFiles = [];
         },
       },
 

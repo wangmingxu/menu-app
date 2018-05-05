@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     code: '',
     signature: '',
     signInfo: null,
+    orderDetail: [],
   },
   mutations: {
     setUserInfo: (state, payload) => {
@@ -25,6 +26,9 @@ const store = new Vuex.Store({
     },
     setSignInfo: (state, payload) => {
       state.signInfo = payload; // eslint-disable-line
+    },
+    setOrderDetail: (state, payload) => {
+      state.orderDetail = payload; // eslint-disable-line
     },
   },
   actions: {

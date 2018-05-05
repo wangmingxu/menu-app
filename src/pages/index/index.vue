@@ -113,7 +113,7 @@
     flex: 1;
   }
 
-  .toggle-like{
+  .toggle-like {
     display: flex;
     align-items: center;
   }
@@ -126,12 +126,13 @@
     background-position: center center;
   }
 
-  .like-count,.dislike-count{
+  .like-count,
+  .dislike-count {
     line-height: 30px;
     font-size: 15px;
   }
 
-  .like-count{
+  .like-count {
     margin-right: 15px;
   }
 
@@ -176,9 +177,9 @@
 
   .icon-cart {
     line-height: 50px;
-    margin-left: 20px;
     font-size: 24px;
     color: #d81e06;
+    padding: 0 20px;
   }
 
   .btn-settle {
@@ -206,11 +207,28 @@
   .cart-box.active {
     transform: scale(1);
   }
+
+  .center-col {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .middle-row {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    justify-content: center;
+  }
+
+  .icon-cart .zan-badge__count {
+    right: 19px;
+    top: -1px;
+  }
 </style>
 
 <template>
   <div class="container">
-    <web-view :src="webviewUrl" v-if="webviewUrl" @message="onWebviewMessage($event)"></web-view>
     <div class="mask" v-if="showCart" @click="toggleCart()"></div>
     <div class="mask" v-if="showAsidebar" @click="toggleAsideBar()"></div>
     <div class="asidebar" :class="{active:showAsidebar}">
@@ -257,7 +275,8 @@
             {{item.name}}
           </div>
           <div class="zan-col zan-col-10">
-            <zan-stepper v-bind="steppers[item.id]" :componentId="item.id" size="small" @handleZanStepperChange="handleZanStepperChange($event)" />
+            <zan-stepper v-bind="steppers[item.id]" :componentId="item.id" size="small" @handleZanStepperChange="handleZanStepperChange($event)"
+            />
           </div>
         </div>
       </div>
@@ -266,10 +285,10 @@
       <div class="zan-icon zan-icon-wap-nav asidebar-btn" @click="toggleAsideBar()"></div>
       {{currentDate}}
     </div>
-    <swiper :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500" @change="onTabChange($event)">
+    <swiper :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500">
       <block v-for="(item, idx) in banners" :key="idx">
         <swiper-item>
-          <image :src="item.cover_url" class="slide-image" height="150" @click="openWithWebview(item.public_target_url)"/>
+          <image :src="item.cover_url" class="slide-image" height="150" @click="openWithWebview(item.public_target_url)" />
         </swiper-item>
       </block>
     </swiper>
@@ -286,7 +305,7 @@
         <div class="time-sel">
           <radio-group @change="mealChange">
             <label class="checkbox" v-for="(item, index) in meals" :key="index">
-              <checkbox :value="item.value" :checked="item.value===currentMeal"/>{{item.name}}
+              <checkbox :value="item.value" :checked="item.value===currentMeal" />{{item.name}}
             </label>
           </radio-group>
         </div>
@@ -299,20 +318,30 @@
           </div>
         </scroll-view>
         <scroll-view class="food-list" :scroll-y="true">
-          <zan-loadmore :loading="true" v-if="loading"></zan-loadmore>
-          <div class="zan-panel">
-            <div class="zan-card" v-for="item in foodList[currentCategory]" :key="item.id">
-              <image class="thumb" :src="item.image_url" alt="" mode="aspectFit" @click="preview(item.image_url)"></image>
-              <div class="food-name">{{item.name}}</div>
-              <div class="zan-row">
-                <div class="zan-col zan-col-11 toggle-like">
-                  <div class="btn-like" :class="{active:item.liked}" @click="toggleLike(item,'like')"></div>
-                  <div class="like-count">{{item.like}}</div>
-                  <div class="btn-dislike" :class="{active:item.unliked}" @click="toggleLike(item,'unlike')"></div>
-                  <div class="dislike-count">{{item.unlike}}</div>
-                </div>
-                <div class="zan-col zan-col-13"  v-if="currentMeal===3">
-                  <zan-stepper v-bind="steppers[item.id]" :componentId="item.id" size="small" @handleZanStepperChange="handleZanStepperChange($event)" />
+          <!-- <zan-loadmore :loading="true" v-if="loading"></zan-loadmore> -->
+          <div class="zan-panel zan-panel--without-border" v-if="!loading" style="margin-top: 0px">
+            <zan-loadmore :nodata="true" v-if="categoryList.length===0&&!loading"></zan-loadmore>
+            <div class="zan-card col-center" v-for="item in foodList[currentCategory]" :key="item.id">
+              <div class="zan-card__thumb">
+                <image class="zan-card__img" :src="item.image_url" mode="aspectFit" @click="preview(item.image_url)"></image>
+              </div>
+              <div class="zan-card__detail middle-row">
+                <div>
+                  <div class="zan-card__detail-row center-col" style="text-align: right">
+                    {{item.name}}
+                  </div>
+
+                  <div class="zan-card__detail-row toggle-like center-col">
+                    <div class="btn-like" :class="{active:item.liked}" @click="toggleLike(item,'like')"></div>
+                    <div class="like-count">{{item.like}}</div>
+                    <div class="btn-dislike" :class="{active:item.unliked}" @click="toggleLike(item,'unlike')"></div>
+                    <div class="dislike-count">{{item.unlike}}</div>
+                  </div>
+
+                  <div class="zan-card__detail-row center-col" v-if="currentMeal===3">
+                    <zan-stepper v-bind="steppers[item.id]" :componentId="item.id" size="small" @handleZanStepperChange="handleZanStepperChange($event)"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -320,8 +349,10 @@
         </scroll-view>
       </div>
       <div class="ft-bar" :class="{fixd:showCart}" v-if="currentMeal===3">
-        <div class="zan-icon zan-icon-shopping-cart icon-cart" @click="toggleCart()"></div>
-          <div class="zan-btn zan-btn--primary zan-btn--small btn-settle" @click="createOrder()">选好了</div>
+        <div class="zan-icon zan-icon-shopping-cart icon-cart zan-badge" @click="toggleCart()">
+          <div class="zan-badge__count">{{totaCount}}</div>
+        </div>
+        <div class="zan-btn zan-btn--primary zan-btn--small btn-settle" @click="createOrder()">选好了</div>
       </div>
     </div>
   </div>
@@ -333,14 +364,19 @@
   import ZanStepper from 'zanui/components/zan/stepper';
   import flatten from 'lodash/flatten';
   import uniqBy from 'lodash/uniqBy';
-  import promisify from '@/utils/promisify';
-  import genTimeRange from '@/utils/index';
+  import isEmpty from 'lodash/isEmpty';
+  import omit from 'lodash/omit';
+  import promisify, { sleep } from '@/utils/promisify';
+  import { genTimeRange, getMeal } from '@/utils/index';
+  import store from '@/store/index';
+  import { mapMutations, mapState } from 'vuex';
 
   export default {
     components: {
       ZanLoadmore,
       ZanStepper,
     },
+    store,
     data() {
       return {
         loading: false,
@@ -352,17 +388,19 @@
         ],
         weeks: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
         curDayIndex: new Date().getDay() - 1,
-        currentMeal: 1,
+        currentMeal: -1,
         categoryList: [],
         foodList: {},
-        currentCategory: 0,
+        currentCategory: null,
         showAsidebar: false,
         showCart: false,
         steppers: {},
-        webviewUrl: '',
       };
     },
     computed: {
+      ...mapState([
+        'orderDetail',
+      ]),
       cartList() {
         const checkedList = Object.keys(this.steppers).filter(key => this.steppers[key].stepper > 0);
         return uniqBy(flatten(Object.values(this.foodList)).filter(item => checkedList.includes(`${item.id}`)), 'id');
@@ -373,21 +411,32 @@
       currentDate() {
         return this.timeRange[0].format('YYYY-MM-DD');
       },
+      totaCount() {
+        return this.cartList.reduce((pre, cur) => pre + this.steppers[cur.id].stepper, 0);
+      },
     },
 
     watch: {
-      currentCategory() {
-        this.loadMenu();
-      },
       curDayIndex() {
+        this.steppers = {};
+        this.currentCategory = null;
         this.loadMenu();
       },
       currentMeal() {
+        this.currentCategory = null;
         this.loadMenu();
+      },
+      orderDetail() {
+        if (isEmpty(this.orderDetail)) {
+          this.clearCart();
+        }
       },
     },
 
     methods: {
+      ...mapMutations([
+        'setOrderDetail',
+      ]),
       listCategory() {
         return this.$http.get('/menu-category', {
           company_id: 1,
@@ -397,22 +446,31 @@
           });
       },
       loadMenu() {
-        return this.$http.get('/menu', {
-          category_id: this.currentCategory,
+        this.loading = true;
+        this.$http.get('/menu', {
+          company_id: 1,
           start_at: this.timeRange[0].format('YYYY-MM-DD HH:mm'),
           end_at: this.timeRange[1].format('YYYY-MM-DD HH:mm'),
-        }).then((data) => {
-          data.items.forEach((item) => {
-            if (!this.steppers[item.id]) {
-              Vue.set(this.steppers, item.id, {
-                stepper: 0,
-                min: 0,
-                max: 20,
-              });
+        })
+          .then((data) => {
+            this.loading = false;
+            data.items.forEach((item) => {
+              Vue.set(this.foodList, item.id, item.menus);
+            });
+            this.categoryList = data.items.map(item => omit(item, 'menus'));
+            [].concat(...data.items.map(item => item.menus)).forEach((item) => {
+              if (!this.steppers[item.id]) {
+                Vue.set(this.steppers, item.id, {
+                  stepper: 0,
+                  min: 0,
+                  max: 20,
+                });
+              }
+            });
+            if (!this.currentCategory && this.categoryList.length > 0) {
+              this.currentCategory = this.categoryList[0].id;
             }
           });
-          Vue.set(this.foodList, this.currentCategory, data.items);
-        });
       },
       loadUserInfo() {
         this.$http.get('/account/info').then((data) => {
@@ -430,23 +488,23 @@
           this.banners = data.items;
         });
       },
-      onTabChange(e) {
-        console.log(e);
-      },
       mealChange(e) {
-        console.log('checkbox发生change事件，携带value值为：', e);
+        // console.log('checkbox发生change事件，携带value值为：', e);
         this.currentMeal = +e.target.value;
       },
       weekrChange(e) {
-        console.log('picker发送选择改变，携带值为', e);
+        // console.log('picker发送选择改变，携带值为', e);
         this.curDayIndex = e.target.value;
       },
-      categoryChange(id) {
+      async categoryChange(id) {
+        this.loading = true;
+        await sleep(100);
+        this.loading = false;
         this.currentCategory = id;
       },
       handleZanStepperChange(e) {
         const { componentId, stepper } = e;
-        console.log(this.steppers);
+        // console.log(this.steppers);
         this.steppers[componentId].stepper = stepper;
       },
       toggleAsideBar() {
@@ -456,17 +514,19 @@
         this.showCart = !this.showCart;
       },
       async toggleLike(item, type) {
-        // Vue.set(item, 'liked', status);
         if (type === 'like') {
           await this.$http.get('/like-menu/toggle-like', {
             menu_id: item.id,
           });
+          Vue.set(item, 'like', +item.like + (item.liked ? -1 : 1));
+          Vue.set(item, 'liked', !item.liked);
         } else {
           await this.$http.get('/like-menu/toggle-unlike', {
             menu_id: item.id,
           });
+          Vue.set(item, 'unlike', +item.unlike + (item.unliked ? -1 : 1));
+          Vue.set(item, 'unliked', !item.unliked);
         }
-        this.loadMenu();
       },
       clearCart() {
         Object.keys(this.steppers).forEach((key) => {
@@ -475,8 +535,8 @@
       },
       preview(url) {
         wx.previewImage({
-          urls:[url]
-        })
+          urls: [url],
+        });
       },
       async createOrder() {
         if (this.cartList.length === 0) {
@@ -490,27 +550,35 @@
           item.quantity = this.steppers[item.id].stepper; //eslint-disable-line
           return item;
         });
-        await promisify(wx.setStorage, {
-          key: 'orderDetail',
-          data: orderDetail,
-        });
+        this.setOrderDetail(orderDetail);
+        // await promisify(wx.setStorage, {
+        //   key: 'orderDetail',
+        //   data: orderDetail,
+        // });
         wx.navigateTo({
           url: '/pages/preview/main',
         });
       },
+
+
       openWithWebview(url) {
-        this.webviewUrl = url;
+        wx.navigateTo({
+          url: `/pages/webview/main?url=${encodeURIComponent(url)}`,
+        });
       },
-      onWebviewMessage(e){
-        console.log(e);
-      }
     },
 
-    async onLoad() {
-      this.loadUserInfo();
+    async onShow() {
+      await this.loadUserInfo();
       this.listBanner();
-      await this.listCategory();
-      this.currentCategory = this.categoryList[0].id;
+      // await this.listCategory();
+      if (this.currentMeal < 0) {
+        this.currentMeal = getMeal();
+      }
+      this.loadMenu();
+    },
+    onHide() {
+      this.showAsidebar = false;
     },
   };
 </script>

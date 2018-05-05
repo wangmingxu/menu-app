@@ -9,7 +9,7 @@
 	},
 	"miniprogramRoot": "./dist/",
 	"compileType": "miniprogram",
-	"appid": "wxa99258dba832ee61",
+	"appid": "wxb2f7a84454d7aef4",
 	"projectname": "dining-menu",
 	"condition": {
 		"search": {

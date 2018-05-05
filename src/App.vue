@@ -30,4 +30,8 @@
   .zan-stepper{
     float: right;
   }
+  .zan-panel-title{
+    color: #333;
+    font-size: 16px;
+  }
 </style>
