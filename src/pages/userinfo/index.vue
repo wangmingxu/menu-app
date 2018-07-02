@@ -11,7 +11,7 @@
 
 <script>
   import ZanField from 'zanui/components/zan/field';
-  import promisify,{sleep} from '@/utils/promisify';
+  import promisify, { sleep } from '@/utils/promisify';
 
   export default {
     components: {
@@ -38,6 +38,7 @@
           handleZanFieldBlur: this.handleNumberBlur,
           value: '',
         },
+        lock: false,
       };
     },
 
@@ -77,14 +78,22 @@
         this.numberFeild.value = target.value;
       },
       async submitForm() {
+        if (this.lock) return;
+        this.lock = true;
         await sleep(100);
         await this.$http.put('/account', {
           name: this.nameFeild.value,
           job_number: this.numberFeild.value,
+          showLoading: true,
+          loadingMsg: '正在提交',
+        }).catch(() => {
+          this.lock = false;
         });
+        this.lock = false;
         await promisify(wx.showToast, {
           title: '提交成功',
           icon: 'success',
+          mask: true,
         });
         await sleep(1500);
         wx.navigateBack();

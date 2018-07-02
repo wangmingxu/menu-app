@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  import promisify from '@/utils/promisify';
 
   export default {
 
@@ -34,20 +33,16 @@
         this.remark = e.target.value;
       },
       async submit() {
-        await promisify(wx.showLoading, { title: '正在提交' });
-        try {
-          await this.$http.post('/reserve-meal-log', {
-            quantity: this.quantity,
-            remark: this.remark,
-          });
-        } catch (error) {
-          console.log(error);
-        } finally {
-          wx.hideLoading();
-        }
+        await this.$http.post('/reserve-meal-log', {
+          quantity: this.quantity,
+          remark: this.remark,
+          showLoading: true,
+          loadingMsg: '正在提交',
+        });
         wx.showToast({
           title: '提交成功',
           icon: 'success',
+          mask: true
         });
         this.resetData();
       },

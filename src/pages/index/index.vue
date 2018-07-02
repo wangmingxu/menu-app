@@ -66,6 +66,7 @@
     height: 40px;
     line-height: 40px;
     border-bottom: 1px solid #ddd;
+    justify-content: space-between;
   }
 
   .sel-box .week-sel {
@@ -80,7 +81,8 @@
 
   .sel-box .time-sel {
     text-align: right;
-    flex: 1;
+    margin-right: 30px
+    /* flex: 1; */
   }
 
   .sel-box .checkbox {
@@ -111,6 +113,10 @@
 
   .food-list {
     flex: 1;
+  }
+
+  .food-list .zan-card{
+    padding: 5px 10px;
   }
 
   .toggle-like {
@@ -158,7 +164,17 @@
   }
 
   .food-name {
-    font-size: 20px;
+    /* width: 150px; */
+    text-align: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    height: 20px;
+    line-height: 20px;
+    /* -webkit-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap; */
   }
 
   .ft-bar {
@@ -288,7 +304,7 @@
     <swiper :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500">
       <block v-for="(item, idx) in banners" :key="idx">
         <swiper-item>
-          <image :src="item.cover_url" class="slide-image" height="150" @click="openWithWebview(item.public_target_url)" />
+          <image :src="item.cover_url" class="slide-image" height="150" @click="openWithWebview(item.target_url)" />
         </swiper-item>
       </block>
     </swiper>
@@ -303,11 +319,12 @@
           </picker>
         </div>
         <div class="time-sel">
-          <radio-group @change="mealChange">
+          <!-- <radio-group @change="mealChange">
             <label class="checkbox" v-for="(item, index) in meals" :key="index">
               <checkbox :value="item.value" :checked="item.value===currentMeal" />{{item.name}}
             </label>
-          </radio-group>
+          </radio-group> -->
+          <ZanTab v-bind="mealTab" :componentId="'mealTab'" :selectedId="currentMeal" @change="handleZanTabChange"/>
         </div>
       </div>
       <div class="main-box">
@@ -327,9 +344,9 @@
               </div>
               <div class="zan-card__detail middle-row">
                 <div>
-                  <div class="zan-card__detail-row center-col" style="text-align: right">
+                  <text class="zan-card__detail-row food-name">
                     {{item.name}}
-                  </div>
+                  </text>
 
                   <div class="zan-card__detail-row toggle-like center-col">
                     <div class="btn-like" :class="{active:item.liked}" @click="toggleLike(item,'like')"></div>
@@ -362,6 +379,7 @@
   import Vue from 'vue';
   import ZanLoadmore from 'zanui/components/zan/loadmore';
   import ZanStepper from 'zanui/components/zan/stepper';
+  import ZanTab from 'zanui/components/zan/tab';
   import flatten from 'lodash/flatten';
   import uniqBy from 'lodash/uniqBy';
   import isEmpty from 'lodash/isEmpty';
@@ -370,24 +388,39 @@
   import { genTimeRange, getMeal } from '@/utils/index';
   import store from '@/store/index';
   import { mapMutations, mapState } from 'vuex';
+  import moment from 'moment';
 
   export default {
     components: {
       ZanLoadmore,
       ZanStepper,
+      ZanTab
     },
     store,
     data() {
       return {
         loading: false,
         banners: [],
+        mealTab: {
+          list: [{
+            id: 1,
+            title: '早餐'
+          }, {
+            id: 2,
+            title: '午餐'
+          }, {
+            id: 3,
+            title: '晚餐'
+          }],
+          scroll: false,
+        },
         meals: [
           { value: 1, name: '早' },
           { value: 2, name: '午' },
           { value: 3, name: '晚' },
         ],
         weeks: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
-        curDayIndex: new Date().getDay() - 1,
+        curDayIndex: moment().isoWeekday() - 1,
         currentMeal: -1,
         categoryList: [],
         foodList: {},
@@ -420,10 +453,12 @@
       curDayIndex() {
         this.steppers = {};
         this.currentCategory = null;
+        this.categoryList = [];
         this.loadMenu();
       },
       currentMeal() {
         this.currentCategory = null;
+        this.categoryList = [];
         this.loadMenu();
       },
       orderDetail() {
@@ -437,6 +472,12 @@
       ...mapMutations([
         'setOrderDetail',
       ]),
+      ...ZanTab.methods,
+      handleZanTabChange (e) {
+        const {componentId, selectedId} = e;
+        this.currentMeal = selectedId;
+        // this[componentId].selectedId = selectedId
+      },
       listCategory() {
         return this.$http.get('/menu-category', {
           company_id: 1,
@@ -488,17 +529,18 @@
           this.banners = data.items;
         });
       },
-      mealChange(e) {
-        // console.log('checkbox发生change事件，携带value值为：', e);
-        this.currentMeal = +e.target.value;
-      },
+      // mealChange(e) {
+      //   // console.log('checkbox发生change事件，携带value值为：', e);
+      //   this.currentMeal = +e.target.value;
+      // },
       weekrChange(e) {
         // console.log('picker发送选择改变，携带值为', e);
         this.curDayIndex = e.target.value;
       },
       async categoryChange(id) {
+        if (this.currentCategory === id) return;
         this.loading = true;
-        await sleep(100);
+        await sleep(50);
         this.loading = false;
         this.currentCategory = id;
       },
@@ -568,7 +610,7 @@
       },
     },
 
-    async onShow() {
+    async onLoad() {
       await this.loadUserInfo();
       this.listBanner();
       // await this.listCategory();

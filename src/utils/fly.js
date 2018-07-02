@@ -24,6 +24,9 @@ try {
 
 fly.interceptors.request.use((request) => {
   // console.time(request.url);
+  if (request.body && Object.prototype.hasOwnProperty.call(request.body, 'showLoading') && request.body.showLoading) {
+    wx.showLoading({ title: request.body.loadingMsg, mask: true });
+  }
   timeLogMap[request.url] = Date.now();
   const needLogin = request.body && Object.prototype.hasOwnProperty.call(request.body, 'needLogin') && request.body.needLogin;
   if (store.state.signInfo && !needLogin) {
@@ -63,6 +66,9 @@ fly.interceptors.request.use((request) => {
 fly.interceptors.response.use(({ data: rst, request }) => {
   // console.timeEnd(request.url);
   console.log(`${request.url}耗时`, Date.now() - timeLogMap[request.url], 'ms');
+  if (request.body && Object.prototype.hasOwnProperty.call(request.body, 'showLoading') && request.body.showLoading) {
+    wx.hideLoading();
+  }
   switch (rst.code) {
     case 0:
       return rst.data;

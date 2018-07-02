@@ -7,7 +7,7 @@
                 <div class="zan-card" v-for="(menu,j) in item.menus" :key="menu.id">
                     <div class="zan-card__thumb">
                         <image class="zan-card__img" :src="menu.image_url"
-                            mode="aspectFit"></image>
+                            mode="widthFix"></image>
                     </div>
                     <div class="zan-card__detail">
                         <div class="zan-card__detail-row">

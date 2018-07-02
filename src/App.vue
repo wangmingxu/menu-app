@@ -27,11 +27,26 @@
   .zan-btn.btn-submit {
     margin: 15px;
   }
-  .zan-stepper{
-    float: right;
-  }
   .zan-panel-title{
     color: #333;
     font-size: 16px;
+  }
+  .zan-tab{
+    height: 35px;
+  }
+  .zan-tab__bd{
+    width: auto;
+    border: none;
+    height: 35px;
+  }
+  .zan-tab__item{
+    height: 35px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 15px;
+  }
+  .zan-tab__title{
+    height: 35px;
+    line-height: 35px;
   }
 </style>

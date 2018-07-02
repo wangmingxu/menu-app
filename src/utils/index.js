@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export function genTimeRange(day, rangeType) {
-  const d = moment(moment().set('days', day).format('YYYY MM DD'));
+  const d = moment(moment().isoWeekday(day).format('YYYY-MM-DD'));
   if (rangeType === 1) {
     return [moment(d).set('hours', 0), moment(d).set('hours', 10)];
   } else if (rangeType === 2) {

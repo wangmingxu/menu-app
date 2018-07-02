@@ -23,9 +23,8 @@
 </template>
 
 <script>
-    import promisify from '@/utils/promisify';
     import store from '@/store/index';
-    import {mapState,mapMutations} from 'vuex';
+    import { mapState, mapMutations } from 'vuex';
 
     export default {
       store,
@@ -34,28 +33,23 @@
           remark: '',
         };
       },
-      computed:{
+      computed: {
         ...mapState([
-          'orderDetail'
-        ])
+          'orderDetail',
+        ]),
       },
 
       methods: {
         ...mapMutations([
-          'setOrderDetail'
+          'setOrderDetail',
         ]),
         async submitOrder() {
-          await promisify(wx.showLoading, { title: '正在提交' });
-          try {
-            await this.$http.post('/order', {
-              menus: this.orderDetail,
-              remark: this.remark,
-            });
-          } catch (error) {
-            console.log(error);
-          } finally {
-            wx.hideLoading();
-          }
+          await this.$http.post('/order', {
+            menus: this.orderDetail,
+            remark: this.remark,
+            showLoading: true,
+            loadingMsg: '正在提交',
+          });
           this.setOrderDetail([]);
           wx.redirectTo({
             url: '/pages/success/main',

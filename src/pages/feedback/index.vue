@@ -67,10 +67,13 @@
           await this.$http.post('/feedback', {
             content: this.remark,
             images: this.files.map(url => ({ url })),
+            showLoading: true,
+            loadingMsg: '正在提交',
           });
           wx.showToast({
             title: '提交成功',
             icon: 'success',
+            mask: true,
           });
           this.resetData();
         },

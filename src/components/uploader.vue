@@ -3,6 +3,7 @@
         <div class="weui-uploader__files" id="uploaderFiles">
             <block v-for="item in files" :key="index">
                 <div class="weui-uploader__file" @click="predivImage" :id="item">
+                    <div class="delete-btn" @click.stop="del(item)">x</div>
                     <image class="weui-uploader__img" :src="item" mode="aspectFill" />
                 </div>
             </block>
@@ -48,6 +49,10 @@
             urls: this.files, // 需要预览的图片http链接列表
           });
         },
+        del(i) {
+          const files = this.files.filter(item => item !== i);
+          this.$emit('fileChange', files);
+        },
       },
     };
 </script>
@@ -81,8 +86,23 @@
 
     .weui-uploader__file {
         float: left;
-        margin-right: 9px;
-        margin-bottom: 9px;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .delete-btn{
+        background-color: crimson;
+        color: #fff;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        border-radius: 50% 50%;
+        text-align: center;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        font-size: 12px;
     }
 
     .weui-uploader__img {
